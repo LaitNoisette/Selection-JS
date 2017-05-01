@@ -9,3 +9,13 @@
 li {
     border: black 1px solid;
 }
+
+#selectbox {
+    position: absolute;
+    height: 0px;
+    width: 0px;
+    border: black 1px solid;
+    display: none;
+    top: 0px;
+    left: 0px;
+}
