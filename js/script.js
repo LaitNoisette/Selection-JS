@@ -84,6 +84,7 @@ $(document).ready(function() {
         ymouse = e.pageY;
         if (mousedownbool == true) {
             sizeSelectBox(xmouse, ymouse);
+            collisionSelectBox();
         }
     });
 
@@ -121,16 +122,19 @@ $(document).ready(function() {
         var xPosBox = $("#selectbox").position().left;
         var yPosBox = $("#selectbox").position().top;
 
+        //cas basique 
         if (yPosInverseOrigin <= yPosMouse) {
             ySelectBoxInverse = false;
             $("#selectbox").css('top', yPosInverseOrigin);
         }
 
+        //cas basique
         if (xPosInverseOrigin <= xPosMouse) {
             xSelectBoxInverse = false;
             $("#selectbox").css('left', xPosInverseOrigin);
         }
 
+        //cas ou la difference entre la postion de la souris et lorigine est negatif (axe y,top)
         if (yPosBox > yPosMouse && ySelectBoxInverse == false) {
             ySelectBoxInverse = true;
             yPosInverseOrigin = yPosBox;
@@ -139,6 +143,7 @@ $(document).ready(function() {
             $("#selectbox").css('top', yPosBox);
         }
 
+        //cas ou la difference entre la position de la souris et lorigine est negatif (axe x,left)
         if (xPosBox > xPosMouse && xSelectBoxInverse == false) {
             xSelectBoxInverse = true;
             xPosInverseOrigin = xPosBox;
@@ -157,11 +162,56 @@ $(document).ready(function() {
             yPosMouse = yPosInverseOrigin;
             $("#selectbox").css('top', yPosBox);
         }
+        //calcul des tailles
         var xsize = Math.abs(xPosMouse - xPosBox);
         var ysize = Math.abs(yPosMouse - yPosBox);
         console.log("taille box xsize : " + xsize + " ysize : " + ysize);
+        //application des tailles
         $("#selectbox").css('height', ysize);
         $("#selectbox").css('width', xsize);
+    }
+
+    //Fonction permettant de controler les collisions de la select box avec les elements selectionnables
+    function collisionSelectBox() {
+        if (mousedownbool == true) {
+            $("li").each(function() {
+                //console.log("gauche : " + $(this).position().left + " Haut : " + $(this).position().top);
+                //Coordonnees de la div selectionnable
+                var xminE = $(this).position().left;
+                var yminE = $(this).position().top;
+                var xmaxE = $(this).position().left + $(this).width();
+                var ymaxE = $(this).position().top + $(this).height();
+                console.log("xminE : " + xminE + " xmaxE : " + xmaxE);
+
+                var xminSB = $("#selectbox").position().left;
+                var yminSB = $("#selectbox").position().top;
+                var xmaxSB = $("#selectbox").position().left + $("#selectbox").width();
+                var ymaxSB = $("#selectbox").position().top + $("#selectbox").height();
+
+                //gestion de la collision
+                if ((xminSB > xmaxE) || (xmaxSB < xminE) || (yminSB > ymaxE) || (ymaxSB < yminE)) {
+                    ncollision_nselect($(this));
+                } else {
+                    console.log("collision");
+                    collision_select($(this));
+                }
+            });
+        }
+
+    }
+
+    //fonction gerant la cas dune collision, element selectionne
+    function collision_select(e) {
+        if (e.hasClass('nselect')) {
+            e.removeClass("nselect").addClass("select");
+        }
+    }
+
+    //fonction gerant labscence de collision
+    function ncollision_nselect(e) {
+        if (e.hasClass('select')) {
+            e.removeClass("select").addClass("nselect");
+        }
     }
 
 });
