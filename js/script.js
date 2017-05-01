@@ -5,6 +5,10 @@ $(document).ready(function() {
     var xmouse;
     var ymouse;
     var mousedownbool = false;
+    var ySelectBoxInverse = false;
+    var xSelectBoxInverse = false;
+    var yPosInverseOrigin;
+    var xPosInverseOrigin;
 
     //Position de chaque elements selectionnable
     $("li").each(function() {
@@ -91,10 +95,12 @@ $(document).ready(function() {
         mousedownbool = true;
     });
 
-    //Detection souris relache
+    //Detection souris relache,remise à 0 de la box de selection
     $(document).mouseup(function(e) {
         console.log("mouseup");
         mousedownbool = false;
+        $("#selectbox").css('height', 0);
+        $("#selectbox").css('width', 0);
         $("#selectbox").hide();
     });
 
@@ -103,6 +109,8 @@ $(document).ready(function() {
         console.log("initialisation box");
         $("#selectbox").css('left', x);
         $("#selectbox").css('top', y);
+        xPosInverseOrigin = x;
+        yPosInverseOrigin = y;
         $("#selectbox").show();
     }
 
@@ -112,17 +120,42 @@ $(document).ready(function() {
         console.log("xposmouse : " + xPosMouse + " yposmouse : " + yPosMouse);
         var xPosBox = $("#selectbox").position().left;
         var yPosBox = $("#selectbox").position().top;
-        if (yPosBox > yPosMouse) {
-            var temp = yPosBox;
+
+        if (yPosInverseOrigin <= yPosMouse) {
+            ySelectBoxInverse = false;
+            $("#selectbox").css('top', yPosInverseOrigin);
+        }
+
+        if (xPosInverseOrigin <= xPosMouse) {
+            xSelectBoxInverse = false;
+            $("#selectbox").css('left', xPosInverseOrigin);
+        }
+
+        if (yPosBox > yPosMouse && ySelectBoxInverse == false) {
+            ySelectBoxInverse = true;
+            yPosInverseOrigin = yPosBox;
             yPosBox = yPosMouse;
-            yPosMouse = temp;
+            yPosMouse = yPosInverseOrigin;
             $("#selectbox").css('top', yPosBox);
         }
-        if (xPosBox > xPosMouse) {
-            var temp = xPosBox;
+
+        if (xPosBox > xPosMouse && xSelectBoxInverse == false) {
+            xSelectBoxInverse = true;
+            xPosInverseOrigin = xPosBox;
             xPosBox = xPosMouse;
-            xPosMouse = temp;
+            xPosMouse = xPosInverseOrigin;
             $("#selectbox").css('left', xPosBox);
+        }
+
+        if (xSelectBoxInverse == true) {
+            xPosBox = xPosMouse;
+            xPosMouse = xPosInverseOrigin;
+            $("#selectbox").css('left', xPosBox);
+        }
+        if (ySelectBoxInverse == true) {
+            yPosBox = yPosMouse;
+            yPosMouse = yPosInverseOrigin;
+            $("#selectbox").css('top', yPosBox);
         }
         var xsize = Math.abs(xPosMouse - xPosBox);
         var ysize = Math.abs(yPosMouse - yPosBox);
